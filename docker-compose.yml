@@ -3,9 +3,7 @@ services:
     container_name: xgl
     hostname: xgl
     # Change tag `latest` to Ubuntu versions such as `24.04`, use a persistent tag such as `24.04-20210101010101` to persist a certain container version
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/lukejmann/glx:latest
     ports:
     - '8080:8080'
     # Internal TURN server settings
