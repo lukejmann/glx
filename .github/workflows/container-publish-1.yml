@@ -12,7 +12,7 @@ on:
     branches: [main]
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: lukejmann/glx
+  IMAGE_NAME: lukejmann/glx-1
 jobs:
   build:
     name: Build and push Ubuntu ${{ matrix.os_version }}
@@ -60,6 +60,7 @@ jobs:
           build-args: |
             DISTRIB_RELEASE=${{ matrix.os_version }}
           context: .
+          file: Dockerfile-1
           labels: ${{ steps.meta.outputs.labels }}
           no-cache: true
           push: ${{ github.event_name != 'pull_request' }}

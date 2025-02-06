@@ -582,7 +582,4 @@ RUN echo 'root:rootpassword' | chpasswd
 # Expose SSH port
 EXPOSE 22
 
-
-
-
 ENTRYPOINT ["/usr/bin/supervisord"]
