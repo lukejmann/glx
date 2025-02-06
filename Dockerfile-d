@@ -3,7 +3,25 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 # Supported base images: Ubuntu 24.04, 22.04, 20.04
+
 FROM nvidia/cuda:12.6.0-devel-ubuntu20.04
+
+# Set up environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="${PATH}:/home/user/.local/bin"
+
+# We love UTF!
+ENV LANG C.UTF-8
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+# Set the nvidia container runtime environment variables
+ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
+ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+ENV CUDA_HOME="/usr/local/cuda"
+ENV TORCH_CUDA_ARCH_LIST="6.0 6.1 7.0 7.5 8.0 8.6+PTX 8.9"
+
 
 LABEL maintainer="https://github.com/ehfd,https://github.com/danisla"
 
@@ -601,12 +619,6 @@ USER 0
 RUN if [ -d "/usr/libexec/sudo" ]; then SUDO_LIB="/usr/libexec/sudo"; else SUDO_LIB="/usr/lib/sudo"; fi && \
     chown -R -f -h --no-preserve-root root:root /usr/bin/sudo-root /etc/sudo.conf /etc/sudoers /etc/sudoers.d /etc/sudo_logsrvd.conf "${SUDO_LIB}" || echo 'Failed to provide root permissions in some paths relevant to sudo' && \
     chmod -f 4755 /usr/bin/sudo-root || echo 'Failed to set chmod setuid for root'
-
-RUN apt-get update && apt-get install -y openssh-server
-
-# Create SSH directory and set permissions
-RUN mkdir /var/run/sshd
-
 USER 1000
 
 ENV PIPEWIRE_LATENCY="128/48000"
@@ -625,15 +637,5 @@ ENV HOME=/home/ubuntu
 WORKDIR /home/ubuntu
 
 EXPOSE 8080
-
-
-# # Allow root login via SSH
-# RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
-
-# # Set root password
-# RUN echo 'ubuntu:ubuntu' | chpasswd
-
-# Expose SSH port
-EXPOSE 22
 
 ENTRYPOINT ["/usr/bin/supervisord"]
