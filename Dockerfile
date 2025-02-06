@@ -565,7 +565,24 @@ RUN printenv > /etc/.env
 # RUN ln -s /usr/bin/python3 /usr/bin/python
 # RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
+EXPOSE 8080
 
-# EXPOSE 8080
+# Install OpenSSH server
+RUN apt-get update && apt-get install -y openssh-server
 
-# ENTRYPOINT ["/usr/bin/supervisord"]
+# Create SSH directory and set permissions
+RUN mkdir /var/run/sshd
+
+# Allow root login via SSH
+RUN echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config
+
+# Set root password
+RUN echo 'root:rootpassword' | chpasswd
+
+# Expose SSH port
+EXPOSE 22
+
+
+
+
+ENTRYPOINT ["/usr/bin/supervisord"]
